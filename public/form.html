@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/ajax_senda" method="post">
+        <input type="text" name="email" id="inputs">
+        <input type="submit">
+    </form>
+    
+        <button>ajax</button>
+        <div class="result"></div>
+    
+
+    <script>
+
+        document.querySelector('button').addEventListener('click', function() {
+            var idata = document.querySelector('input').value
+            ajax('http://localhost:3000/ajax_send', idata)
+            document.querySelector('input').value = '';
+            console.log(idata)
+        })
+
+        function ajax(url, data) {
+            var data = {'email': data}
+            data = JSON.stringify(data)
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url)
+            xhr.setRequestHeader('Content-Type', 'application/json')
+            xhr.send(data)
+
+            xhr.addEventListener('load', function() {
+                var result = JSON.parse(xhr.responseText)
+                document.querySelector('.result').innerHTML += result.bb + '<br>'
+                
+            })
+        }
+
+    </script>
+</body>
+</html>
