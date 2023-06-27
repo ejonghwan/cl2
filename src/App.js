@@ -1,10 +1,17 @@
-import React, { Fragment } from 'react';
-import { Route } from 'react-router-dom/cjs/react-router-dom.min';
+import { Route, Switch } from 'react-router-dom';
 
-
+//common
 import Footer from './components/common/Footer';
 import Header from './components/common/Header';
+
+//main
 import Visual from './components/main/Visual';
+import News from './components/main/News';
+import Pics from './components/main/Pics';
+import Vids from './components/main/Vids';
+import Banner from './components/main/Banner';
+
+//sub
 import Community from './components/sub/Community';
 import Contact from './components/sub/Contact';
 import Department from './components/sub/Department';
@@ -12,54 +19,55 @@ import Gallery from './components/sub/Gallery';
 import Member from './components/sub/Member';
 import Youtube from './components/sub/Youtube';
 
-
-import Pics from './components/main/Pics';
-import Vids from './components/main/Vids';
-import Banner from './components/main/Banner';
-
-
-import Test from './Test'
-import Test2T from './Test2T'
+import './scss/style.scss';
 
 function App() {
 	return (
-		<Fragment>
-			<Header />
-			<Route path="/">
-				<Visual />
-				<Pics />
-				<Vids />
-				<Banner />
-			</Route>
-			<Route path="/department">
+		<>
+			{/* Switch는 내부에 중복되는 라우트 경로가 있을때 먼저 나오는 라우터를 채택하고 나머지는 무시 */}
+			<Switch>
+				<Route exact path='/'>
+					{/* 메인전용 라우터에는 main문자값을 전달 */}
+					<Header type={'main'} />
+					<Visual />
+					<News />
+					<Pics />
+					<Vids />
+					<Banner />
+				</Route>
+
+				<Route path='/'>
+					{/* 서브전용 라우터에는 sub문자값을 전달 */}
+					<Header type={'sub'} />
+				</Route>
+			</Switch>
+
+			<Route path='/department'>
 				<Department />
 			</Route>
-			<Route path="/gallery">
-				<Gallery />
-			</Route>
-			<Route path="/youtube">
-				<Youtube />
-			</Route>
-			<Route path="/contact">
-				<Contact />
-			</Route>
-			<Route path="/member">
-				<Member />
-			</Route>
-			<Route path="/community">
+
+			<Route path='/community'>
 				<Community />
 			</Route>
-			
-		
+
+			<Route path='/gallery'>
+				<Gallery />
+			</Route>
+
+			<Route path='/youtube'>
+				<Youtube />
+			</Route>
+
+			<Route path='/contact'>
+				<Contact />
+			</Route>
+
+			<Route path='/member'>
+				<Member />
+			</Route>
 
 			<Footer />
-
-
-			<br /><br /><br /><br /><br /><br />
-			
-			{/* <Test /> */}
-			<Test2T />
-		</Fragment>
+		</>
 	);
 }
 
