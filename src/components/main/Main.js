@@ -10,6 +10,7 @@ import Btns from './Btns';
 function Main() {
 
 	const [Scrolled, setScrolled] = useState(0);
+	const [Pos, setPos] = useState(0);
 	
 
 
@@ -18,10 +19,10 @@ function Main() {
 			<Header type={'main'} />
 			<Visual />
 			<News />
-			<Pics />
+			<Pics Scrolled={Scrolled} Pos={Pos}/>
 			<Vids />
 			<Banner />
-			<Btns setScrolled={setScrolled}/>
+			<Btns setScrolled={setScrolled} setPos={setPos}/>
 		</main>
 	);
 }
