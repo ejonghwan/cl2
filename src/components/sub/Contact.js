@@ -2,16 +2,17 @@ import Layout from '../common/Layout';
 import { useRef, useEffect, useState } from 'react';
 import emailjs from '@emailjs/browser';
 
-
 function Contact() {
 	const container = useRef(null);
+	const form = useRef(null);
+	const inputName = useRef(null);
+	const inputEmail = useRef(null);
+	const inputMsg = useRef(null);
 	const [Traffic, setTraffic] = useState(false);
 	const [Location, setLocation] = useState(null);
 	const [Index, setIndex] = useState(0);
-	console.log(Index);
-	
+	const [Success, setSuccess] = useState(false);
 
-	//아래 정보값들은 useEffect구문에서 인스턴스 생성할때만 필요한 정보값에 불과하므로 미리 읽히도록 useEffect바깥에 배치
 	const { kakao } = window;
 	const info = [
 		{
@@ -43,26 +44,43 @@ function Contact() {
 	const markerImage = new kakao.maps.MarkerImage(imgSrc, imgSize, imgPos);
 	const marker = new kakao.maps.Marker({ position: option.center, image: markerImage });
 
-	const handleResize = (maps, idx) => {
-		return (e) => {
-			// console.log(maps, idx, e)
-			maps.setCenter(info[idx].latlng);
-		}
-	}
+	//폼메일 전송 함수
+	const sendEmail = (e) => {
+		e.preventDefault();
+
+		emailjs.sendForm('service_4wnjvjd', 'template_651z7ig', form.current, '23g8RepczesqKPoIX').then(
+			(result) => {
+				console.log(result.text);
+				setSuccess(true);
+				inputName.current.value = '';
+				inputEmail.current.value = '';
+				inputMsg.current.value = '';
+			},
+			(error) => {
+				console.log(error.text);
+				setSuccess(false);
+			}
+		);
+	};
 
 	useEffect(() => {
 		container.current.innerHTML = '';
 		const mapInstance = new kakao.maps.Map(container.current, option);
 		marker.setMap(mapInstance);
-		//지도인스턴스에 타입, 줌 컨트롤 추가
 		mapInstance.addControl(new kakao.maps.MapTypeControl(), kakao.maps.ControlPosition.TOPRIGHT);
 		mapInstance.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
-		
-
 		setLocation(mapInstance);
-		window.addEventListener('resize', handleResize(mapInstance, Index))
+
+		//지도영역에 휠 기능 비활성화
+		mapInstance.setZoomable(false);
+
+		const setCenter = () => {
+			mapInstance.setCenter(info[Index].latlng);
+		};
+
+		window.addEventListener('resize', setCenter);
+		return () => window.removeEventListener('resize', setCenter);
 	}, [Index]);
-	
 
 	useEffect(() => {
 		Traffic
@@ -70,31 +88,11 @@ function Contact() {
 			: Location?.removeOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
 	}, [Traffic]);
 
-
-
-
-	// emailjs
-	const form = useRef();
-	const [Success, setSuccess] = useState()
-
-  const sendEmail = (e) => {
-    e.preventDefault();
-
-    emailjs.sendForm('service_rq833zr', 'template_iav35ok', form.current, 'kqZyhq3UF7CqFUd-c')
-      .then((result) => {
-        setSuccess(true)
-      }, (error) => {
-		setSuccess(false)
-        console.log(error.text);
-      });
-  };
-
 	return (
 		<Layout name={'Contact'}>
-			<div id='map' ref={container} style={{ width: "100%", height: "500px" }}></div>
+			<div id='map' ref={container}></div>
 			<button onClick={() => setTraffic(!Traffic)}>{Traffic ? 'Traffic ON' : 'Traffic OFF'}</button>
 
-			{/* 배열정보값을 토대로 동적으로 li지점버튼 생성하고 해당 버튼 클릭할때 순서값 State를 변경하면서 지도화면이 갱신되도록 수정 */}
 			<ul className='branch'>
 				{info.map((el, idx) => {
 					return (
@@ -105,21 +103,18 @@ function Contact() {
 				})}
 			</ul>
 
-
-
-			<div className='form'>
+			<div id='formBox'>
 				<form ref={form} onSubmit={sendEmail}>
 					<label>Name</label>
-					<input type="text" name="name" />
+					<input type='text' name='name' ref={inputName} />
 					<label>Email</label>
-					<input type="email" name="email" />
+					<input type='email' name='email' ref={inputEmail} />
 					<label>Message</label>
-					<textarea name="message" />
-					<input type="submit" value="Send" />
+					<textarea name='message' ref={inputMsg} />
+					<input type='submit' value='Send' />
 				</form>
-				{Success ? <p style={{ color: "blue" }}>성공적으로 전송</p> : <p style={{ color: "red" }}>전송에 실패했습니다</p>}
+				{Success && <p>메일이 성공적으로 발송되었습니다.</p>}
 			</div>
-			
 		</Layout>
 	);
 }
